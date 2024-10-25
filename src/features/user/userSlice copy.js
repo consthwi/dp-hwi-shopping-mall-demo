@@ -4,27 +4,11 @@ import { showToastMessage } from "../common/uiSlice";
 import api from "../../utils/api";
 import { initialCart } from "../cart/cartSlice";
 
-// 로그인 버튼 클릭 시 요청받는 API
 export const loginWithEmail = createAsyncThunk(
   "user/loginWithEmail",
-  async ({ email, password }, { rejectWithValue }) => {
-    try {
-      const res = await api.post("/auth/login", { email, password });
-      // => authController.loginWithEmail로부터 data: {status, user, token} 받음.
-
-      // 1. 성공
-      // 1-1. Loginpage에서 main으로 리다이렉트
-      // 1-2. 성공 시 data return, fulfilled 대기
-      return res.data;
-    } catch (error) {
-      // 2. 실패
-      // 2-1. 실패한 에러값 return, reject 대기
-      return rejectWithValue(error.error);
-    }
-  }
+  async ({ email, password }, { rejectWithValue }) => {}
 );
 
-// 구글로그인 버튼 클릭 시 요청받는 API
 export const loginWithGoogle = createAsyncThunk(
   "user/loginWithGoogle",
   async (token, { rejectWithValue }) => {}
@@ -32,41 +16,41 @@ export const loginWithGoogle = createAsyncThunk(
 
 export const logout = () => (dispatch) => {};
 
-// 회원가입 버튼 클릭 시 요청받는 API
+// 회원가입 백엔드
+// registerUser api생성 => userSlice의 extraReducer로 사용
 export const registerUser = createAsyncThunk(
   "user/registerUser",
   async (
-    // createAsyncThunk("name", async({사용자정의값}, {thunkAPI 메서드})=>{})
     { email, name, password, navigate },
     { dispatch, rejectWithValue }
   ) => {
     try {
       const res = await api.post("/user", { email, name, password });
-      // 성공
-      // 1. 성공 토스트 메세지 보여주기
-      // uiSlice에 있는 reducer호출 ... dispatch(reducer)
-      // reducer에서 payload객체 {message: "~", status: "~"}사용 가능
       dispatch(
         showToastMessage({
-          message: "회원가입을 성공했습니다!",
+          message: "회원가입이 완료되었습니다.",
           status: "success",
         })
       );
-      // 2. 로그인페이지 리다이렉트
       navigate("/login");
-      return res.data.data; // fulfilled 사용대기
+      return res.data.data;
     } catch (error) {
-      // 실패
-      // 1. 실패 토스트 메세지 보여주기
       dispatch(
         showToastMessage({
-          message: "회원가입에 실패했습니다!",
+          message: "회원가입에 실패했습니다.",
           status: "error",
         })
       );
-      // 2. 에러값을 저장
-      return rejectWithValue(error.error); // 다시 확인하기
+      return rejectWithValue(error.error);
+      // reject에 { status: "fail", error: //error.message// } 사용
     }
+    // 1. 성공
+    // 1-1. 토스트메시지 성공 출력
+    // 1-2. 로그인페이지 리다이렉트
+    // 1-3. data를 return하여 fulfilled실행
+    // 2. 실패
+    // 2-1. 토스트메시지 실패 출력
+    // 2-2. thunkAPI(rejectWithValue)로 reject실행
   }
 );
 
@@ -103,18 +87,6 @@ const userSlice = createSlice({
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.registrationError = action.payload;
-      })
-      .addCase(loginWithEmail.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(loginWithEmail.fulfilled, (state, action) => {
-        state.loading = false;
-        state.user = action.payload.user;
-        state.loginError = null;
-      })
-      .addCase(loginWithEmail.rejected, (state, action) => {
-        state.loading = true;
-        state.loginError = action.payload; // error.error
       });
   },
 });

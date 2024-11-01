@@ -53,16 +53,6 @@ const AdminProductPage = () => {
     const query = params.toString();
     // console.log("query: ", query);
     navigate("?" + query);
-    // 상품 검색하기..
-    // 검색어나 페이지가 바뀌면 url바꿔주기 (검색어또는 페이지가 바뀜 => url 바꿔줌=> url쿼리 읽어옴=> 이 쿼리값 맞춰서  상품리스트 가져오기)
-    if (searchQuery.name === "") {
-      delete searchQuery.name; // <다시
-    }
-    // console.log("searchQuery: ", searchQuery);
-    const params = new URLSearchParams(searchQuery);
-    const query = params.toString();
-    // console.log("query: ", query);
-    navigate("?" + query);
   }, [searchQuery]);
 
   // 상품생성이 끝나고 showDialog가 닫힐 경우, 상품호출 다시
@@ -84,23 +74,12 @@ const AdminProductPage = () => {
   const handleClickNewItem = () => {
     //new 모드로 설정하고
     setMode("new");
-    setMode("new");
     // 다이얼로그 열어주기
-    setShowDialog(true);
     setShowDialog(true);
   };
 
   const handlePageClick = ({ selected }) => {
     //  쿼리에 페이지값 바꿔주기
-    // console.log("selected:", selected);... 페이지네이션 -1
-    setSearchQuery({ ...searchQuery, page: selected + 1 });
-  };
-
-  // 1. searchBox에서 검색어를 읽어온다 => 엔터를 치면 => searchQuery객체가 업데이트 됨
-  // e.g. {name: 스트레이트 팬츠}
-  // => 2. serachQuery객체 안의 아이템 기준으로 url을 새로 생성해서 호출
-  // e.g. &name=스트레이트+팬츠
-  // => 3. url쿼리 읽어오기 => url쿼리 기준으로 백엔드에 검색조건과 함께 호출
     // console.log("selected:", selected);... 페이지네이션 -1
     setSearchQuery({ ...searchQuery, page: selected + 1 });
   };
@@ -129,7 +108,6 @@ const AdminProductPage = () => {
         <ProductTable
           header={tableHeader}
           data={productList}
-          data={productList}
           deleteItem={deleteItem}
           openEditForm={openEditForm}
         />
@@ -137,7 +115,6 @@ const AdminProductPage = () => {
           nextLabel="next >"
           onPageChange={handlePageClick}
           pageRangeDisplayed={5}
-          pageCount={totalPageNum} // 전체페이지
           pageCount={totalPageNum} // 전체페이지
           forcePage={searchQuery.page - 1}
           previousLabel="< previous"
